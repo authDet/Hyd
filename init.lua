@@ -5,8 +5,8 @@ if oh then
 end
 
 local web = true
-local user = "Upbolt" -- change if you're using a fork
-local branch = "revision"
+local user = "authDet" 
+local branch = "refs/heads/main" 
 local importCache = {}
 
 local function hasMethods(methods)
@@ -132,30 +132,28 @@ environment.oh = {
         for _i, event in pairs(oh.Events) do
             event:Disconnect()
         end
-
+    
         for original, hook in pairs(oh.Hooks) do
             local hookType = type(hook)
             if hookType == "function" then
                 if hookfunction then
                     hookfunction(hook, original)
                 end
-
-            if type(hook) == "table" and hook.Closure and hook.Original and hookfunction then
+            elseif hookType == "table" and hook.Closure and hook.Original and hookfunction then
                 hookfunction(hook.Closure.Data, hook.Original)
             end
         end
-
+    
         local ui = importCache["rbxassetid://11389137937"]
         local assets = importCache["rbxassetid://5042114982"]
-
+    
         if ui and next(ui) then
             unpack(ui):Destroy()
         end
-
+    
         if assets and next(assets) then
             unpack(assets):Destroy()
         end
-
     end
 }
 
