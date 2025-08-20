@@ -136,48 +136,67 @@ environment.oh = {
         for original, hook in pairs(oh.Hooks) do
             local hookType = type(hook)
             if hookType == "function" then
-                hookFunction(hook, original)
-            elseif hookType == "table" then
-                hookFunction(hook.Closure.Data, hook.Original)
+                if hookfunction then
+                    hookfunction(hook, original)
+                end
+
+            if type(hook) == "table" and hook.Closure and hook.Original and hookfunction then
+                hookfunction(hook.Closure.Data, hook.Original)
             end
         end
 
         local ui = importCache["rbxassetid://11389137937"]
         local assets = importCache["rbxassetid://5042114982"]
 
-        if ui then
+        if ui and next(ui) then
             unpack(ui):Destroy()
         end
 
-        if assets then
+        if assets and next(assets) then
             unpack(assets):Destroy()
         end
+
     end
 }
 
 if getConnections then 
     for __, connection in pairs(getConnections(game:GetService("ScriptContext").Error)) do
 
-        local conn = getrawmetatable(connection)
-        local old = conn and conn.__index
-        
-        if PROTOSMASHER_LOADED ~= nil then setwriteable(conn) else setReadOnly(conn, false) end
-        
-        if old then
-            conn.__index = newcclosure(function(t, k)
-                if k == "Connected" then
-                    return true
-                end
-                return old(t, k)
-            end)
-        end
+        local conn = getrawmetatable and getrawmetatable(connection)
+        if conn then
+            local old = conn.__index
+             if PROTOSMASHER_LOADED ~= nil then
+                if setwriteable then setwriteable(conn) end
+            else
+                if setReadOnly then setReadOnly(conn, false) end
+            end
 
-        if PROTOSMASHER_LOADED ~= nil then
-            setReadOnly(conn)
-            connection:Disconnect()
-        else
-            setReadOnly(conn, true)
-            connection:Disable()
+        
+            if old then
+                if newcclosure then
+                    conn.__index = newcclosure(function(t, k)
+                        if k == "Connected" then
+                            return true
+                        end
+                        return old(t, k)
+                    end)
+                else
+                    conn.__index = function(t, k)
+                        if k == "Connected" then
+                            return true
+                        end
+                        return old and old(t, k)
+                    end
+                end
+            end
+
+            if PROTOSMASHER_LOADED ~= nil then
+                if connection.Disconnect then
+                    connection:Disconnect()
+                elseif connection.Disable then
+                    connection:Disable()
+                end
+            end
         end
     end
 end
