@@ -11,7 +11,7 @@ webImport("init")
 webImport("ui/main")
 ```
 
-# Hydroxide
+# Hyd
 <i>Lua runtime introspection and network capturing tool for games on the Roblox engine.</i>
 
 ~~Report issues to our Discord server: https://discord.gg/DJxBwAX~~
